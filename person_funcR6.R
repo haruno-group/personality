@@ -1,7 +1,7 @@
 ########################################################
 # functions
 ########################################################
-pacman::p_load(magrittr, stringr, R6)
+pacman::p_load(tidyverse, R6)
 
 colsum <- function(dat, name) { 
   res <- dat %>% t() %>% data.frame() %>% dplyr::summarise_all(dplyr::funs(sum)) %>% 
