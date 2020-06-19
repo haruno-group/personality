@@ -1,4 +1,5 @@
 
+# install.packages('pacman') 
 source('xxx/person_funcR6.R')
 parse = scoring$new()
 
