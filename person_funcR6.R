@@ -700,7 +700,7 @@ scoring = R6Class('scoring', public = list(
     score[is.na(score)] <- 100
     score <- round(score / 100) %>% dplyr::tbl_df()
     
-    score2 <- dat %>% dplyr::select(IMCQ2) %>% dplyr::rename("Webfre"=IMCQ2)
+    score2 <- dat %>% dplyr::select(IMCQ2) %>% dplyr::rename("Webfreq"=IMCQ2)
     score2[is.na(score2)] <- 0
     
     return(score %>% colsum("IMC") %>% dplyr::bind_cols(score2))
