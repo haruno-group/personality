@@ -726,7 +726,7 @@ scoring = R6Class('scoring', public = list(
                         Incon10 = abs(score$`ARSQ[11]` - score$`ARSQ[28]`),
                         Incon11 = abs(score$`ARSQ[14]` - score$`ARSQ[31]`))
     ARS1 = get_subset(arsdat, seq(11), "ARS_incon")
-    ARS2 = get_subset(score, c(3,21,24,7,10,12,20,29,27,4,15), "ARS_infre")
+    ARS2 = get_subset(score, c(3,21,24,7,10,12,20,29,27,4,15), "ARS_infreq")
     
     return(ARS1 %>% dplyr::bind_cols(ARS2) %>% dplyr::tbl_df())
   },
