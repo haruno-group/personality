@@ -665,7 +665,7 @@ scoring = R6Class('scoring', public = list(
     return(STAI1 %>% dplyr::bind_cols(STAI2))
   },
   
-  SDSJ = function(dat) {
+  SDS = function(dat) {
     score <- dat %>% dplyr::select(`SDSJQ[1]`:`SDSJQ[20]`)
     for(i in 1:20)  score[,i] <- score[,i] %>% unlist %>% as.numeric
     
