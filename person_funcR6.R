@@ -17,6 +17,12 @@ get_subset = function(score, subset, pername) {
   return(res)
 }
 
+scraping = function(url) {
+  htmldat = httr::GET(url) %>% httr::content('raw') %>% xml2::read_html()
+  answer = readr::read_csv(htmldat %>% rvest::html_nodes("p") %>% rvest::html_text())
+}
+
+
 scoring = R6Class('scoring', public = list(
   
   AQ = function(dat) {
@@ -122,7 +128,7 @@ scoring = R6Class('scoring', public = list(
     score <- dat %>% dplyr::select(`IRI2Q[1]`:`IRI2Q[28]`)
     for(i in seq(ncol(score)))
       score[,i] <- score[,i] %>% unlist %>% str_remove("a") %>% as.numeric()
-      
+
     IRI1 <- get_subset(score, c(1,5,7,12,16,23,26), "IRI_F")
     IRI2 <- get_subset(score, c(3,8,11,15,21,25,28), "IRI_PT")
     IRI3 <- get_subset(score, c(2,4,9,14,18,20,22), "IRI_EC")
@@ -232,8 +238,8 @@ scoring = R6Class('scoring', public = list(
       dplyr::select(Big5_F, Big5_S, Big5_E, Big5_A, Big5_C, Big5_N, Big5_O, age, ID, who)
     BIGFIVE$age[is.na(BIGFIVE$age)] <- 0
     
-    # 青年:12-22, 成人前期:23-39, 成人中期:40-59, 成人後期:>60
-    answer <- readxl::read_xls("/Users/kmori/Dropbox/CiNet/data/Personality/Big5.xls")
+    # youth:12-22, pre-adult:23-39, mid-adult:40-59, post-adult:>60
+    answer <- scraping('https://raw.githubusercontent.com/haruno-group/personality/master/Big5.csv')
     point <- answer %>% dplyr::select(`12-22`:`60-999`) %>% 
       dplyr::mutate(`12-22` = as.numeric(`12-22`), `23-39` = as.numeric(`23-39`), 
                     `40-59` = as.numeric(`40-59`), `60-999` = as.numeric(`60-999`), `0` = 0)
@@ -426,7 +432,7 @@ scoring = R6Class('scoring', public = list(
     for(i in seq(ncol(score)))
       score[,i] <- score[,i] %>% unlist %>% str_remove("A") %>% as.numeric()
     
-    adat <- readxl::read_xls("/Users/kmori/Dropbox/CiNet/data/Personality/IQ.xls") %>% 
+    adat <- scraping('https://raw.githubusercontent.com/haruno-group/personality/master/IQ.csv') %>% 
       dplyr::select(A1:A8)
     adat$A2 <- replace(adat$A2, which(adat$A2=="1"), 2)
     adat$A3 <- replace(adat$A3, which(adat$A3=="1"), 3)
