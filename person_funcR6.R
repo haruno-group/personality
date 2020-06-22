@@ -25,6 +25,14 @@ scraping = function(url) {
 
 scoring = R6Class('scoring', public = list(
   
+  subjinf = function(dat) {
+    inf <- dat %>% dplyr::select(attribute_1, token, sbjage, sbjgender)
+    inf$sbjgender <- inf$sbjgender %>% str_replace("M", "1") %>% str_replace("F", "2") %>% 
+      as.numeric()
+    
+    return(inf)
+  },
+  
   AQ = function(dat) {
     score <- dat %>% dplyr::select(`AQQ[1]`:`AQQ[50]`)
     
@@ -128,7 +136,7 @@ scoring = R6Class('scoring', public = list(
     score <- dat %>% dplyr::select(`IRI2Q[1]`:`IRI2Q[28]`)
     for(i in seq(ncol(score)))
       score[,i] <- score[,i] %>% unlist %>% str_remove("a") %>% as.numeric()
-
+    
     IRI1 <- get_subset(score, c(1,5,7,12,16,23,26), "IRI_F")
     IRI2 <- get_subset(score, c(3,8,11,15,21,25,28), "IRI_PT")
     IRI3 <- get_subset(score, c(2,4,9,14,18,20,22), "IRI_EC")
@@ -310,7 +318,7 @@ scoring = R6Class('scoring', public = list(
         dplyr::bind_cols(allBIGFIVE %>% dplyr::arrange(ID) %>% dplyr::select(-age, -ID, -who)) %>% 
         dplyr::select(-age, -ID, -who)
     }
-
+    
     return(BIGFIVE)
   },
   
@@ -449,16 +457,8 @@ scoring = R6Class('scoring', public = list(
       score[,i] <- ifelse(score[,i] %>% unlist==answer[,i], 1, 0)
     
     # IQ = get_subset(score, seq(ncol(score)), "IQ")
-    return(score %>% colsum("IQ"))
+    return(score %>% colsum("RavenIQ"))
   },
-  
-  # # # JART
-  # # if(year==2016) {
-  # #   score <- readr::read_csv("//133.243.177.165/Public/kmori/Questionnaire/JART2016.csv")
-  # #   JART = score %>% dplyr::select(`JARTEVAL[Total]`) %>% dplyr::rename("JART"=`JARTEVAL[Total]`)
-  # # }
-  # # if(year==2017)
-  # #   JART = readr::read_csv("//133.243.177.165/Public/kmori/Questionnaire/JART2017.csv")
   
   LPC = function(dat) {
     score <- dat %>% dplyr::select(`LPCQ001[SQ001]`:`LPCQ018[SQ001]`)
@@ -494,7 +494,7 @@ scoring = R6Class('scoring', public = list(
     OCIR6 <- get_subset(score, c(4,10,16), "OCIR_NE")
     return(OCIR1 %>% dplyr::bind_cols(OCIR2, OCIR3, OCIR4, OCIR5, OCIR6))
   },
-
+  
   PANAS = function(dat) {
     score <- dat %>% dplyr::select(`PANAS20Q[1]`:`PANAS20Q[20]`)
     for(i in seq(ncol(score)))
@@ -505,7 +505,7 @@ scoring = R6Class('scoring', public = list(
     
     return(PANAS1 %>% dplyr::bind_cols(PANAS2))
   },
-
+  
   PDI = function(dat) {
     score <- dat %>% dplyr::select(PDIG001Q01:PDIG040Q04)
     for(i in seq(ncol(score))) {
@@ -694,7 +694,7 @@ scoring = R6Class('scoring', public = list(
     
     return(SES)
   },
-
+  
   IMC = function(dat) {
     score <- dat %>% dplyr::select(`IMCQ1[1]`:`IMCQ1[3]`)
     score[is.na(score)] <- 100
@@ -737,10 +737,10 @@ scoring = R6Class('scoring', public = list(
       score[,i] <- score[,i] %>% unlist %>% str_remove("A") %>% as.numeric()
     
     names(score) = c("FB", "Twi", "Insta", "LINE", "SG_freq", "SG_time", "SG_buy", 
-                   "SNS_freq", "Real_freq")
+                     "SNS_freq", "Real_freq")
     return(score)
   },
-
+  
   NET = function(dat) {
     score <- dat %>% dplyr::select(`NETQ[NETSQ001]`:`NETQ[NETSQ0020]`)
     
@@ -750,7 +750,7 @@ scoring = R6Class('scoring', public = list(
     
     return(NET1 %>% dplyr::bind_cols(NET2, NETall))
   },
-
+  
   UCLA = function(dat) {
     score <- dat %>% dplyr::select(`UCLAQ[1]`:`UCLAQ[20]`)
     score <- score %>% 
@@ -786,10 +786,10 @@ scoring = R6Class('scoring', public = list(
       dplyr::filter(time <= thre, time >= 0) %>% dplyr::mutate(time="short")
     long <- data.frame(duration = (day+time), id = dat$id) %>% 
       dplyr::filter(time > thre | time < 0) %>% dplyr::mutate(time="long")
-    sortdat <- long %>% dplyr::bind_rows(short) %>% dplyr::tbl_df()
+    sortdat <- long %>% dplyr::bind_rows(short) %>% dplyr::tbl_df() %>% 
+      dplyr::arrange(id) %>% dplyr::select(-id)
     names(sortdat)[1] <- "duration"
     
-    return(sortdat %>% dplyr::arrange(id))
-  }
-  )
+    return(sortdat)
+  })
 )
