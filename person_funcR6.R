@@ -5,7 +5,7 @@ pacman::p_load(tidyverse, R6)
 
 colsum <- function(dat, name) { 
   res <- dat %>% t() %>% data.frame() %>% dplyr::summarise_all(dplyr::funs(sum)) %>% 
-    t() %>% data.frame() %>% dplyr::tbl_df() 
+    t() %>% data.frame() %>% tibble::as_tibble() 
   names(res) <- name
   return(res)
 }
@@ -117,7 +117,7 @@ scoring = R6Class('scoring', public = list(
     for(i in 1:10)  score[,i] <- score[,i] %>% unlist %>% as.numeric
     score <- score %>% 
       dplyr::mutate(`PSSQ[4]`= 6-`PSSQ[4]`, `PSSQ[5]`= 6-`PSSQ[5]`, `PSSQ[8]`= 6-`PSSQ[8]`) - 1
-    return(get_subset(score, seq(ncol(score)), "PSS") %>% dplyr::tbl_df())
+    return(get_subset(score, seq(ncol(score)), "PSS") %>% tibble::as_tibble())
   },
   
   RSS = function(dat) {
@@ -625,7 +625,7 @@ scoring = R6Class('scoring', public = list(
     TIM <- replace(TIM, which(TIM==13), 200); TIM <- replace(TIM, which(TIM==14), 300)
     TIM <- replace(TIM, which(TIM==15), 400); TIM <- replace(TIM, which(TIM==0), 400)
     
-    return(data.frame(TIM = TIM) %>% dplyr::tbl_df())
+    return(data.frame(TIM = TIM) %>% tibble::as_tibble())
   },
   
   TAS = function(dat) {
@@ -690,7 +690,7 @@ scoring = R6Class('scoring', public = list(
                       SES_parents = dplyr::if_else(dat$SESQ02 > dat$SESQ03,dat$SESQ02,dat$SESQ03),
                       SES_salary  = dat$SES2Q01, 
                       SES_job     = dat$SES2Q02,
-                      SES_subj    = dat$`SES2Q03[SQ001]`) %>% dplyr::tbl_df()
+                      SES_subj    = dat$`SES2Q03[SQ001]`) %>% tibble::as_tibble()
     
     return(SES)
   },
@@ -698,7 +698,7 @@ scoring = R6Class('scoring', public = list(
   IMC = function(dat) {
     score <- dat %>% dplyr::select(`IMCQ1[1]`:`IMCQ1[3]`)
     score[is.na(score)] <- 100
-    score <- round(score / 100) %>% dplyr::tbl_df()
+    score <- round(score / 100) %>% tibble::as_tibble()
     
     score2 <- dat %>% dplyr::select(IMCQ2) %>% dplyr::rename("Webfreq"=IMCQ2)
     score2[is.na(score2)] <- 0
@@ -728,7 +728,7 @@ scoring = R6Class('scoring', public = list(
     ARS1 = get_subset(arsdat, seq(11), "ARS_incon")
     ARS2 = get_subset(score, c(3,21,24,7,10,12,20,29,27,4,15), "ARS_infreq")
     
-    return(ARS1 %>% dplyr::bind_cols(ARS2) %>% dplyr::tbl_df())
+    return(ARS1 %>% dplyr::bind_cols(ARS2) %>% tibble::as_tibble())
   },
   
   SNS = function(dat) {
@@ -772,21 +772,21 @@ scoring = R6Class('scoring', public = list(
   },
   
   time = function(dat, thre=60) {
-    stdat <- data.frame(time = dat$startdate) %>% dplyr::tbl_df() %>%
+    stdat <- data.frame(time = dat$startdate) %>% tibble::as_tibble() %>%
       tidyr::separate(col = time, into = c("ymd", "time"), sep = " ")
-    endat <- data.frame(time = dat$datestamp) %>% dplyr::tbl_df() %>%
+    endat <- data.frame(time = dat$datestamp) %>% tibble::as_tibble() %>%
       tidyr::separate(col = time, into = c("ymd", "time"), sep = " ")
     
     day <- data.frame(day = as.difftime(endat$ymd, format="%Y-%m-%d", units="mins") -
                         as.difftime(stdat$ymd, format="%Y-%m-%d", units="mins") )
     time <- data.frame(time = as.difftime(endat$time, units="mins") - 
-                         as.difftime(stdat$time, units="mins") %>% round) %>% dplyr::tbl_df()
+                         as.difftime(stdat$time, units="mins") %>% round) %>% tibble::as_tibble()
     
     short <- data.frame(duration = (day+time), id = dat$id) %>% 
       dplyr::filter(time <= thre, time >= 0) %>% dplyr::mutate(time="short")
     long <- data.frame(duration = (day+time), id = dat$id) %>% 
       dplyr::filter(time > thre | time < 0) %>% dplyr::mutate(time="long")
-    sortdat <- long %>% dplyr::bind_rows(short) %>% dplyr::tbl_df() %>% 
+    sortdat <- long %>% dplyr::bind_rows(short) %>% tibble::as_tibble() %>% 
       dplyr::arrange(id) %>% dplyr::select(-id)
     names(sortdat)[1] <- "duration"
     
