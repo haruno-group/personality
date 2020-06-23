@@ -1,2 +1,2 @@
-# personality scoring
-- use R 3.5 or leter
+# Personality scoring
+- Use R 3.5 or leter
