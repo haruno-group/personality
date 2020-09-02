@@ -71,6 +71,7 @@ scoring = R6Class('scoring', public = list(
     BAQ2 <- get_subset(score, c(6,8,11,13,4), "BAQ_A")
     BAQ3 <- get_subset(score, c(23,15,7,20,10,18), "BAQ_H")
     BAQ4 <- get_subset(score, c(9,22,1,3,12), "BAQ_V")
+    
     return(BAQ1 %>% dplyr::bind_cols(BAQ2, BAQ3, BAQ4))
   },
   
