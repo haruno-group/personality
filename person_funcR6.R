@@ -500,7 +500,7 @@ scoring = R6Class('scoring', public = list(
     for(i in seq(ncol(score)))
       score[,i] <- score[,i] %>% unlist %>% str_remove("A") %>% as.numeric()
     
-    PANAS1 <- get_subset(score, c(2,4,7,8,10,12,13,14,17,20 ), "PosA")
+    PANAS1 <- get_subset(score, c(2,4,7,8,10,12,13,14,17,20), "PosA")
     PANAS2 <- get_subset(score, c(1,3,5,6,9,11,15,16,18,19), "NegA")
     
     return(PANAS1 %>% dplyr::bind_cols(PANAS2))
@@ -553,8 +553,8 @@ scoring = R6Class('scoring', public = list(
       dplyr::mutate(`RRQQ[13]`= 6-`RRQQ[13]`, `RRQQ[14]`= 6-`RRQQ[14]`,`RRQQ[17]`= 6-`RRQQ[17]`,
                     `RRQQ[20]`= 6-`RRQQ[20]`,`RRQQ[24]`= 6-`RRQQ[24]`) 
     
-    RRQ1 <- get_subset(score, seq(12), "RRQ_RU")
-    RRQ2 <- get_subset(score, seq(12), "RRQ_RE")
+    RRQ1 <- get_subset(score, c(5,2,12,3,7,8,4,11,6,1,10,9), "RRQ_RU")
+    RRQ2 <- get_subset(score, c(22,24,21,23,20,18,15,16,13,17,14,19), "RRQ_RE")
     
     return(RRQ1 %>% dplyr::bind_cols(RRQ2))
   },
